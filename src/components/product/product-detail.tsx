@@ -6,11 +6,20 @@ import { toast } from "sonner";
 import { Minus, Plus, ShoppingBag, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { WishlistButton } from "@/components/product/wishlist-button";
 import { useCart } from "@/lib/store/cart";
 import { cn, formatLKR, discountPercent } from "@/lib/utils";
 import type { ProductDetail as ProductDetailType } from "@/server/queries/catalog";
 
-export function ProductDetail({ product }: { product: ProductDetailType }) {
+export function ProductDetail({
+  product,
+  isAuthed,
+  wishlisted,
+}: {
+  product: ProductDetailType;
+  isAuthed: boolean;
+  wishlisted: boolean;
+}) {
   const addItem = useCart((s) => s.addItem);
 
   const [activeImage, setActiveImage] = useState(0);
@@ -196,6 +205,11 @@ export function ProductDetail({ product }: { product: ProductDetailType }) {
             <Button size="lg" className="hidden flex-1 sm:flex" onClick={handleAdd}>
               <ShoppingBag className="h-4 w-4" /> Add to Bag
             </Button>
+            <WishlistButton
+              productId={product.id}
+              isAuthed={isAuthed}
+              initialWishlisted={wishlisted}
+            />
           </div>
 
           {/* Meta */}

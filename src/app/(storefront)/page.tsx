@@ -13,16 +13,18 @@ import {
   getNewArrivals,
   getFeaturedProducts,
   getBestSellers,
+  getProductsByCategorySlug,
 } from "@/server/queries/catalog";
 import { getSiteSettings } from "@/server/services/settings";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [newArrivals, featured, bestSellers, settings] = await Promise.all([
+  const [newArrivals, featured, bestSellers, hoodies, settings] = await Promise.all([
     getNewArrivals(8),
     getFeaturedProducts(8),
     getBestSellers(4),
+    getProductsByCategorySlug("hoodies", 4),
     getSiteSettings(),
   ]);
 
@@ -57,6 +59,20 @@ export default async function HomePage() {
         <SectionHeading eyebrow="Curated" title="Featured" href="/shop" />
         <ProductGrid products={featured} />
       </section>
+
+      {/* Hoodies collection */}
+      {hoodies.length > 0 && (
+        <section className="border-y border-border bg-secondary/20">
+          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+            <SectionHeading
+              eyebrow="Heavyweight fleece"
+              title="The Hoodie Collection"
+              href="/shop?category=hoodies"
+            />
+            <ProductGrid products={hoodies} />
+          </div>
+        </section>
+      )}
 
       <CustomCTA />
 

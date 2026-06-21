@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Heart } from "lucide-react";
 import { requireUser } from "@/lib/auth-guard";
 import { prisma } from "@/server/db";
-import { ProductGrid } from "@/components/product/product-grid";
+import { ProductCard } from "@/components/product/product-card";
+import { WishlistButton } from "@/components/product/wishlist-button";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -49,7 +50,16 @@ export default async function WishlistPage() {
           <Button asChild><Link href="/shop">Discover Products</Link></Button>
         </div>
       ) : (
-        <ProductGrid products={products} />
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+          {products.map((p) => (
+            <div key={p.id} className="relative">
+              <div className="absolute right-2 top-2 z-10">
+                <WishlistButton productId={p.id} isAuthed initialWishlisted variant="icon" />
+              </div>
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

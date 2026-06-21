@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/product/product-detail";
 import { getProductBySlug } from "@/server/queries/catalog";
+import { getWishlistedProductIds } from "@/server/actions/wishlist";
+import { auth } from "@/auth";
 import { BRAND } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +43,10 @@ export default async function ProductPage({
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
+  const [session, wishlistedIds] = await Promise.all([auth(), getWishlistedProductIds()]);
+  const isAuthed = !!session?.user;
+  const wishlisted = wishlistedIds.includes(product.id);
+
   const price = product.discountPrice ?? product.price;
   const jsonLd = {
     "@context": "https://schema.org",
@@ -65,7 +71,7 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProductDetail product={product} />
+      <ProductDetail product={product} isAuthed={isAuthed} wishlisted={wishlisted} />
     </>
   );
 }

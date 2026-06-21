@@ -35,6 +35,7 @@ const NAV_LINKS = [
   { label: "Cotton", href: "/shop?category=cotton-printed" },
   { label: "Acid Wash", href: "/shop?category=acid-wash" },
   { label: "Oversized", href: "/shop?category=oversized" },
+  { label: "Hoodies", href: "/shop?category=hoodies" },
   { label: "Custom Design", href: "/custom-design" },
 ];
 

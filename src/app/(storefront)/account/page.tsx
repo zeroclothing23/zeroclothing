@@ -4,6 +4,7 @@ import { Package, Heart, MapPin, BadgeCheck, AlertCircle } from "lucide-react";
 import { requireUser } from "@/lib/auth-guard";
 import { getUserProfile } from "@/server/queries/account";
 import { SignOutButton } from "@/components/account/sign-out-button";
+import { AddressManager } from "@/components/account/address-manager";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "My Account" };
@@ -45,11 +46,25 @@ export default async function AccountPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="mb-8 grid gap-4 sm:grid-cols-3">
         <AccountTile href="/orders" icon={Package} title="Orders" desc="Track your purchases" />
         <AccountTile href="/wishlist" icon={Heart} title="Wishlist" desc="Saved pieces" />
         <AccountTile href="/account" icon={MapPin} title="Addresses" desc={`${profile?.addresses.length ?? 0} saved`} />
       </div>
+
+      <AddressManager
+        addresses={(profile?.addresses ?? []).map((a) => ({
+          id: a.id,
+          label: a.label,
+          fullName: a.fullName,
+          phone: a.phone,
+          province: a.province,
+          district: a.district,
+          addressLine: a.addressLine,
+          postalCode: a.postalCode,
+          isDefault: a.isDefault,
+        }))}
+      />
     </div>
   );
 }

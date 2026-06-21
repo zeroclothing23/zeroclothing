@@ -59,7 +59,8 @@ async function main() {
     { name: "Cotton Printed", slug: "cotton-printed", description: "Premium combed-cotton printed tees.", position: 1 },
     { name: "Acid Wash", slug: "acid-wash", description: "Hand-finished acid wash streetwear.", position: 2 },
     { name: "Oversized", slug: "oversized", description: "Drop-shoulder oversized silhouettes.", position: 3 },
-    { name: "Custom Design", slug: "custom-design", description: "Made-to-order custom prints.", position: 4 },
+    { name: "Hoodies", slug: "hoodies", description: "Heavyweight fleece hoodies for the cooler evenings.", position: 4 },
+    { name: "Custom Design", slug: "custom-design", description: "Made-to-order custom prints.", position: 5 },
   ];
   const categoryMap: Record<string, string> = {};
   for (const c of categories) {
@@ -155,6 +156,41 @@ async function main() {
       colors: ["Washed Black", "Sand"],
       tags: ["oversized", "heavyweight"],
       flags: { isFeatured: true },
+    },
+    {
+      name: "ZERØ Core Heavyweight Hoodie",
+      slug: "zero-core-heavyweight-hoodie",
+      category: "hoodies",
+      price: 11900,
+      discountPrice: 9900,
+      material: "450gsm Brushed Fleece",
+      weightGrams: 620,
+      colors: ["Black", "Bone"],
+      tags: ["hoodie", "heavyweight", "fleece"],
+      flags: { isFeatured: true, isNewArrival: true, isBestSeller: true },
+    },
+    {
+      name: "Acid Wash Pullover Hoodie",
+      slug: "acid-wash-pullover-hoodie",
+      category: "hoodies",
+      price: 12900,
+      material: "450gsm Acid Washed Fleece",
+      weightGrams: 640,
+      colors: ["Washed Black", "Stone Grey"],
+      tags: ["hoodie", "acid-wash", "fleece"],
+      flags: { isFeatured: true, isNewArrival: true },
+    },
+    {
+      name: "Oversized Zip-Up Hoodie",
+      slug: "oversized-zip-up-hoodie",
+      category: "hoodies",
+      price: 13500,
+      discountPrice: 11500,
+      material: "480gsm Heavyweight Fleece",
+      weightGrams: 700,
+      colors: ["Black", "Sand"],
+      tags: ["hoodie", "oversized", "zip"],
+      flags: { isBestSeller: true },
     },
   ];
 
