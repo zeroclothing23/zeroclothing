@@ -9,6 +9,9 @@ import {
   Truck,
   Store,
   Tag,
+  Sparkles,
+  Users,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,8 +19,11 @@ const LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/custom-requests", label: "Custom Requests", icon: Sparkles },
+  { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/shipping", label: "Shipping", icon: Truck },
   { href: "/admin/coupons", label: "Coupons", icon: Tag },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminNav() {

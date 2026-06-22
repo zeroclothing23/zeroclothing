@@ -37,14 +37,14 @@ export default async function AdminProductsPage() {
             {products.map((p) => (
               <tr key={p.id} className="hover:bg-secondary/30">
                 <td className="p-3">
-                  <div className="flex items-center gap-3">
+                  <Link href={`/admin/products/${p.id}`} className="flex items-center gap-3 hover:text-primary">
                     {p.image && (
                       <div className="relative h-10 w-10 overflow-hidden rounded bg-secondary">
                         <Image src={p.image} alt={p.name} fill className="object-cover" sizes="40px" />
                       </div>
                     )}
                     <span className="font-medium">{p.name}</span>
-                  </div>
+                  </Link>
                 </td>
                 <td className="p-3 text-muted-foreground">{p.category}</td>
                 <td className="p-3">

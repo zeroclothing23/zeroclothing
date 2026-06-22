@@ -4,11 +4,15 @@ import { prisma } from "@/server/db";
 import { auth } from "@/auth";
 import { customDesignSchema } from "@/lib/validations/checkout";
 import { sendEmail, adminEmail } from "@/server/services/email";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { BRAND } from "@/lib/constants";
 
 type Result = { ok: boolean; message: string };
 
 export async function submitCustomDesign(input: unknown): Promise<Result> {
+  const rl = rateLimit(`custom:${await clientIp()}`, { limit: 5, windowMs: 60_000 });
+  if (!rl.ok) return { ok: false, message: "Too many requests. Please try again shortly." };
+
   const parsed = customDesignSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, message: parsed.error.issues[0]?.message ?? "Please check the form." };

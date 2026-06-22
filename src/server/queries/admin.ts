@@ -113,3 +113,68 @@ export async function listShippingRates() {
   const rates = await prisma.shippingRate.findMany({ orderBy: { position: "asc" } });
   return rates.map((r) => ({ ...r, price: Number(r.price) }));
 }
+
+export async function listCustomRequests() {
+  return prisma.customRequest.findMany({ orderBy: { createdAt: "desc" } });
+}
+
+export async function getProductForEdit(id: string) {
+  const p = await prisma.product.findUnique({
+    where: { id },
+    include: {
+      images: { orderBy: { position: "asc" } },
+      variants: { orderBy: [{ color: "asc" }, { size: "asc" }] },
+    },
+  });
+  if (!p) return null;
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    description: p.description,
+    price: Number(p.price),
+    discountPrice: p.discountPrice ? Number(p.discountPrice) : null,
+    weightGrams: p.weightGrams,
+    material: p.material,
+    tags: p.tags,
+    categoryId: p.categoryId,
+    isActive: p.isActive,
+    isFeatured: p.isFeatured,
+    isNewArrival: p.isNewArrival,
+    isBestSeller: p.isBestSeller,
+    images: p.images.map((i) => i.url),
+    variants: p.variants.map((v) => ({
+      id: v.id,
+      sku: v.sku,
+      size: v.size,
+      color: v.color,
+      stock: v.stock,
+      lowStockAlert: v.lowStockAlert,
+    })),
+  };
+}
+
+export async function listCustomers() {
+  const users = await prisma.user.findMany({
+    where: { role: "USER" },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      emailVerified: true,
+      createdAt: true,
+      _count: { select: { orders: true } },
+    },
+  });
+  return users.map((u) => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    phone: u.phone,
+    verified: !!u.emailVerified,
+    createdAt: u.createdAt,
+    orderCount: u._count.orders,
+  }));
+}

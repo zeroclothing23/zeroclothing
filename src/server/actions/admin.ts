@@ -199,6 +199,44 @@ export async function updateVariantStock(variantId: string, stock: number): Prom
   return { ok: true, message: "Stock updated." };
 }
 
+const CUSTOM_STATUSES = [
+  "NEW",
+  "REVIEWING",
+  "QUOTED",
+  "ACCEPTED",
+  "REJECTED",
+  "COMPLETED",
+] as const;
+
+export async function updateCustomRequestStatus(id: string, status: string): Promise<Result> {
+  await requireAdmin();
+  if (!CUSTOM_STATUSES.includes(status as never)) {
+    return { ok: false, message: "Invalid status." };
+  }
+  await prisma.customRequest.update({ where: { id }, data: { status: status as never } });
+  revalidatePath("/admin/custom-requests");
+  return { ok: true, message: `Request marked ${status}.` };
+}
+
+export async function saveSettings(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const entries: Record<string, string> = {
+    social_instagram: String(formData.get("social_instagram") ?? ""),
+    social_tiktok: String(formData.get("social_tiktok") ?? ""),
+    social_facebook: String(formData.get("social_facebook") ?? ""),
+    social_youtube: String(formData.get("social_youtube") ?? ""),
+    support_whatsapp: String(formData.get("support_whatsapp") ?? ""),
+    free_shipping_threshold: String(formData.get("free_shipping_threshold") ?? "0"),
+  };
+  await prisma.$transaction(
+    Object.entries(entries).map(([key, value]) =>
+      prisma.setting.upsert({ where: { key }, update: { value }, create: { key, value } }),
+    ),
+  );
+  revalidatePath("/admin/settings");
+  revalidatePath("/", "layout");
+}
+
 export async function saveCoupon(formData: FormData): Promise<void> {
   await requireAdmin();
   const code = String(formData.get("code") ?? "").trim().toUpperCase();

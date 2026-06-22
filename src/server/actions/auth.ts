@@ -9,6 +9,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
 } from "@/lib/validations/auth";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { BRAND } from "@/lib/constants";
 
 type ActionResult = { ok: boolean; message: string };
@@ -40,6 +41,9 @@ export async function registerUser(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  const rl = rateLimit(`register:${await clientIp()}`, { limit: 5, windowMs: 60_000 });
+  if (!rl.ok) return { ok: false, message: "Too many attempts. Please try again shortly." };
+
   const parsed = registerSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -101,6 +105,9 @@ export async function requestPasswordReset(
   _prev: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
+  const rl = rateLimit(`reset:${await clientIp()}`, { limit: 5, windowMs: 60_000 });
+  if (!rl.ok) return { ok: false, message: "Too many attempts. Please try again shortly." };
+
   const parsed = forgotPasswordSchema.safeParse({ email: formData.get("email") });
   if (!parsed.success) return { ok: false, message: "Enter a valid email." };
 

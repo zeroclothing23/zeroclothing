@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 import { verifyNotifySignature, mapPayhereStatus } from "@/lib/payhere";
 import { sendOrderConfirmation } from "@/server/services/notifications";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 /**
  * PayHere server-to-server IPN. PayHere POSTs form-encoded data here after a
@@ -10,6 +11,12 @@ import { sendOrderConfirmation } from "@/server/services/notifications";
  * does not retry indefinitely once we've processed it.
  */
 export async function POST(req: NextRequest) {
+  // Throttle abusive callers; legitimate PayHere IPNs are well under this.
+  const rl = rateLimit(`payhere-notify:${await clientIp()}`, { limit: 30, windowMs: 60_000 });
+  if (!rl.ok) {
+    return NextResponse.json({ ok: false, error: "rate_limited" }, { status: 429 });
+  }
+
   const form = await req.formData();
   const payload = Object.fromEntries(form.entries()) as Record<string, string>;
 
