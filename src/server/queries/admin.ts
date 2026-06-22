@@ -118,6 +118,38 @@ export async function listCustomRequests() {
   return prisma.customRequest.findMany({ orderBy: { createdAt: "desc" } });
 }
 
+const PAID_STATUSES = ["PAID", "PROCESSING", "PRINTING", "PACKED", "SHIPPED", "DELIVERED"] as const;
+
+/** Revenue + order count per day for the last `days` days (oldest → newest). */
+export async function getRevenueByDay(days = 14) {
+  const since = new Date();
+  since.setHours(0, 0, 0, 0);
+  since.setDate(since.getDate() - (days - 1));
+
+  const orders = await prisma.order.findMany({
+    where: { createdAt: { gte: since }, status: { in: PAID_STATUSES as never } },
+    select: { total: true, createdAt: true },
+  });
+
+  // Bucket by yyyy-mm-dd
+  const buckets = new Map<string, { revenue: number; orders: number }>();
+  for (let i = 0; i < days; i++) {
+    const d = new Date(since);
+    d.setDate(since.getDate() + i);
+    buckets.set(d.toISOString().slice(0, 10), { revenue: 0, orders: 0 });
+  }
+  for (const o of orders) {
+    const key = o.createdAt.toISOString().slice(0, 10);
+    const b = buckets.get(key);
+    if (b) {
+      b.revenue += Number(o.total);
+      b.orders += 1;
+    }
+  }
+
+  return [...buckets.entries()].map(([date, v]) => ({ date, ...v }));
+}
+
 export async function getProductForEdit(id: string) {
   const p = await prisma.product.findUnique({
     where: { id },

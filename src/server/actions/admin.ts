@@ -5,6 +5,7 @@ import { Prisma, Size } from "@prisma/client";
 import { prisma } from "@/server/db";
 import { requireAdmin } from "@/lib/auth-guard";
 import { sendOrderStatusUpdate } from "@/server/services/notifications";
+import { logAudit } from "@/server/services/audit";
 import { slugify } from "@/lib/utils";
 import { SIZES } from "@/lib/constants";
 
@@ -42,6 +43,7 @@ export async function updateOrderStatus(orderId: string, status: string): Promis
   }
 
   sendOrderStatusUpdate(orderId, status).catch((e) => console.error("[admin] status email", e));
+  await logAudit("order.status", "Order", orderId, { status });
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");
   return { ok: true, message: `Order marked ${status}.` };
@@ -142,6 +144,7 @@ export async function saveProduct(formData: FormData): Promise<Result> {
         data: imageUrls.map((url, i) => ({ productId: id, url, position: i })),
       });
     }
+    await logAudit("product.update", "Product", id, { name });
     revalidatePath("/admin/products");
     return { ok: true, message: "Product updated." };
   }
@@ -182,6 +185,7 @@ export async function saveProduct(formData: FormData): Promise<Result> {
       },
     },
   });
+  await logAudit("product.create", "Product", undefined, { name });
   revalidatePath("/admin/products");
   return { ok: true, message: "Product created." };
 }
@@ -214,6 +218,7 @@ export async function updateCustomRequestStatus(id: string, status: string): Pro
     return { ok: false, message: "Invalid status." };
   }
   await prisma.customRequest.update({ where: { id }, data: { status: status as never } });
+  await logAudit("custom.status", "CustomRequest", id, { status });
   revalidatePath("/admin/custom-requests");
   return { ok: true, message: `Request marked ${status}.` };
 }

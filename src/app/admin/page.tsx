@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { ShoppingCart, DollarSign, Users, Package, AlertTriangle } from "lucide-react";
-import { getDashboardStats } from "@/server/queries/admin";
+import { getDashboardStats, getRevenueByDay } from "@/server/queries/admin";
 import { formatLKR } from "@/lib/utils";
 import { OrderStatusPill } from "@/components/admin/order-status-pill";
+import { SalesChart } from "@/components/admin/sales-chart";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const stats = await getDashboardStats();
+  const [stats, revenue] = await Promise.all([getDashboardStats(), getRevenueByDay(14)]);
 
   const cards = [
     { label: "Revenue", value: formatLKR(stats.revenue), icon: DollarSign },
@@ -32,6 +33,8 @@ export default async function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      <SalesChart data={revenue} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent orders */}
