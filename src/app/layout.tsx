@@ -20,6 +20,9 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
+  verification: {
+  google: "KFdWrHJIUVqklYt0Rc5dmXy37zM4DF6yjMHe-I9Rk_g",
+},
   title: {
     default: `${BRAND.name} — ${BRAND.tagline}`,
     template: `%s · ${BRAND.name}`,
